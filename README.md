@@ -186,11 +186,67 @@ WSLの起動時に自動的に監視を開始する場合：
 5. 重複ファイルはMD5ハッシュで検出してスキップ
 6. 指定日数を経過した古いファイルは自動削除
 
+## MCP（Model Context Protocol）サーバーとしての使用
+
+### MCPサーバーのインストール
+
+```bash
+# MCP環境の自動セットアップ
+./install_mcp.sh
+```
+
+### 手動設定
+
+1. MCPライブラリのインストール：
+   ```bash
+   pip3 install mcp
+   ```
+
+2. Claude Desktop設定ファイル（`~/.config/claude/claude_desktop_config.json`）に追加：
+   ```json
+   {
+     "mcpServers": {
+       "screenshot-manager": {
+         "command": "python3",
+         "args": ["/path/to/screenshot-manager/mcp_screenshot_server.py"],
+         "env": {}
+       }
+     }
+   }
+   ```
+
+3. Claude Desktopを再起動
+
+### MCPツールの使用
+
+Claude Desktop内で自然言語でスクリーンショット機能を操作できます：
+
+```
+# 使用例
+「モニター一覧を表示して」
+「Chromeのスクリーンショットを撮影して」
+「モニター1のスクリーンショットを保存して」
+「スクリーンショット監視を開始して」
+```
+
+### 利用可能なMCPツール
+
+- `list_monitors`: 利用可能なモニター一覧表示
+- `list_windows`: 実行中のウィンドウ一覧表示
+- `take_screenshot`: 全画面スクリーンショット撮影
+- `take_monitor_screenshot`: 指定モニターのスクリーンショット撮影
+- `take_process_screenshot`: 指定プロセスのスクリーンショット撮影
+- `take_window_screenshot`: 指定ウィンドウのスクリーンショット撮影
+- `monitor_status`: 監視状態確認
+- `start_monitor`: 監視開始
+- `stop_monitor`: 監視停止
+
 ## 必要な環境
 
 - Windows 10/11 with WSL2
 - Python 3.6以上
 - bash
+- MCP対応クライアント（Claude Desktop等）（オプション）
 
 ## ライセンス
 

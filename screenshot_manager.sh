@@ -33,6 +33,7 @@ show_help() {
     echo "  cleanup     - 古いファイルを削除"
     echo "  config      - 設定ファイルを編集"
     echo "  logs        - ログを表示"
+    echo "  screenshot  - WSLからスクリーンショットを撮影"
     echo "  help        - このヘルプを表示"
     echo ""
     echo "オプション:"
@@ -258,12 +259,17 @@ case "$1" in
         shift
         show_logs "$@"
         ;;
+    screenshot)
+        # スクリーンショット撮影
+        shift
+        "$SCRIPT_DIR/take_screenshot.sh" "$@"
+        ;;
     help|--help|-h)
         show_help
         ;;
     *)
         echo "不明なコマンド: $1"
-        echo "使用方法: $0 {setup|start|stop|restart|status|watch|organize|cleanup|config|logs|help}"
+        echo "使用方法: $0 {setup|start|stop|restart|status|watch|organize|cleanup|config|logs|screenshot|help}"
         exit 1
         ;;
 esac
