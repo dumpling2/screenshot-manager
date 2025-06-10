@@ -2,7 +2,7 @@
   "mcpServers": {
     "screenshot-manager": {
       "command": "python3",
-      "args": ["/home/mikanu/便利アプリ/screenshot manager/mcp_screenshot_server.py"],
+      "args": ["/path/to/screenshot-manager/mcp_screenshot_server.py"],
       "env": {}
     }
   }
