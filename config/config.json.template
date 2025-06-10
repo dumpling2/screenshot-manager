@@ -1,0 +1,14 @@
+{
+  "windowsUsername": "{WINDOWS_USERNAME}",
+  "windowsScreenshotPath": "/mnt/c/Users/{username}/Pictures/Screenshots",
+  "localScreenshotPath": "screenshots",
+  "checkInterval": 2,
+  "filePattern": ["*.png", "*.jpg", "*.jpeg"],
+  "organizeByDate": true,
+  "dateFormat": "%Y-%m-%d",
+  "maxFileSizeMB": 50,
+  "autoCleanup": {
+    "enabled": true,
+    "daysToKeep": 30
+  }
+}

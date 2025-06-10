@@ -1,0 +1,42 @@
+# 設定ファイル（ユーザー固有）
+config/config.json
+
+# スクリーンショット
+screenshots/
+
+# ログファイル
+logs/
+*.log
+*.pid
+
+# Claude関連
+.claude/
+CLAUDE.md
+CLAUDE/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 一時ファイル
+*.tmp
+*.bak
+*.cache
