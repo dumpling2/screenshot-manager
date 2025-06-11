@@ -1,0 +1,186 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: screenshot-manager
+  namespace: screenshot-system
+  labels:
+    app: screenshot-manager
+    version: v3.0.0
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: screenshot-manager
+  template:
+    metadata:
+      labels:
+        app: screenshot-manager
+        version: v3.0.0
+    spec:
+      containers:
+      - name: screenshot-manager
+        image: screenshot-manager:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: ENV
+          value: "production"
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: PROMETHEUS_HOST
+          value: "prometheus-service"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: screenshots-storage
+          mountPath: /app/screenshots
+        - name: logs-storage
+          mountPath: /app/logs
+        - name: config-volume
+          mountPath: /app/config
+      volumes:
+      - name: screenshots-storage
+        persistentVolumeClaim:
+          claimName: screenshots-pvc
+      - name: logs-storage
+        persistentVolumeClaim:
+          claimName: logs-pvc
+      - name: config-volume
+        configMap:
+          name: screenshot-manager-config
+      restartPolicy: Always
+      
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-server
+  namespace: screenshot-system
+  labels:
+    app: mcp-server
+    version: v3.0.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mcp-server
+  template:
+    metadata:
+      labels:
+        app: mcp-server
+        version: v3.0.0
+    spec:
+      containers:
+      - name: mcp-server
+        image: screenshot-manager:latest
+        command: ["mcp-server"]
+        ports:
+        - containerPort: 8081
+          name: mcp
+        env:
+        - name: ENV
+          value: "production"
+        - name: LOG_LEVEL
+          value: "INFO"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+        volumeMounts:
+        - name: screenshots-storage
+          mountPath: /app/screenshots
+        - name: logs-storage
+          mountPath: /app/logs
+        - name: config-volume
+          mountPath: /app/config
+      volumes:
+      - name: screenshots-storage
+        persistentVolumeClaim:
+          claimName: screenshots-pvc
+      - name: logs-storage
+        persistentVolumeClaim:
+          claimName: logs-pvc
+      - name: config-volume
+        configMap:
+          name: screenshot-manager-config
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-monitor
+  namespace: screenshot-system
+  labels:
+    app: webapp-monitor
+    version: v3.0.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp-monitor
+  template:
+    metadata:
+      labels:
+        app: webapp-monitor
+        version: v3.0.0
+    spec:
+      containers:
+      - name: webapp-monitor
+        image: screenshot-manager:latest
+        command: ["screenshot-monitor"]
+        env:
+        - name: ENV
+          value: "production"
+        - name: LOG_LEVEL
+          value: "INFO"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+        volumeMounts:
+        - name: screenshots-storage
+          mountPath: /app/screenshots
+        - name: logs-storage
+          mountPath: /app/logs
+        - name: config-volume
+          mountPath: /app/config
+      volumes:
+      - name: screenshots-storage
+        persistentVolumeClaim:
+          claimName: screenshots-pvc
+      - name: logs-storage
+        persistentVolumeClaim:
+          claimName: logs-pvc
+      - name: config-volume
+        configMap:
+          name: screenshot-manager-config

@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: screenshot-manager-config
+  namespace: screenshot-system
+data:
+  config.json: |
+    {
+      "windowsUsername": "appuser",
+      "screenshotDir": "/app/screenshots",
+      "outputDir": "/app/screenshots",
+      "logLevel": "INFO",
+      "maxFileAge": 7,
+      "monitorInterval": 2.0,
+      "enableCleanup": true,
+      "maxScreenshots": 1000
+    }
+  webapp_config.json: |
+    {
+      "DEFAULT_PORTS": [3000, 3001, 5000, 5173, 5174, 8000, 8080, 8888, 4200, 4000, 9000],
+      "CHECK_INTERVAL": 5.0,
+      "STARTUP_DELAY": 2.0,
+      "MAX_RETRIES": 3,
+      "VIEWPORTS": [
+        {"width": 1920, "height": 1080, "name": "desktop"},
+        {"width": 1366, "height": 768, "name": "laptop"},
+        {"width": 768, "height": 1024, "name": "tablet"},
+        {"width": 375, "height": 667, "name": "mobile"}
+      ],
+      "BROWSER_OPTIONS": {
+        "headless": true,
+        "args": [
+          "--no-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-gpu",
+          "--window-size=1920,1080"
+        ]
+      }
+    }
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: screenshot-manager-secrets
+  namespace: screenshot-system
+type: Opaque
+data:
+  # Base64 encoded values
+  redis-password: cGFzc3dvcmQxMjM=  # password123
+  grafana-password: YWRtaW4xMjM=     # admin123
+  api-key: c2VjcmV0LWFwaS1rZXk=      # secret-api-key
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: screenshot-system
+  labels:
+    name: screenshot-system
+    environment: production
