@@ -1,0 +1,33 @@
+{
+  "check_interval": 2,
+  "additional_ports": [],
+  "exclude_ports": [],
+  "startup_timeout": 30,
+  "capture": {
+    "wait_before_capture": 2000,
+    "pages": ["/"],
+    "error_selectors": [
+      ".error",
+      ".alert-danger",
+      "[data-testid='error-message']"
+    ],
+    "viewports": {
+      "desktop": {
+        "width": 1920,
+        "height": 1080
+      },
+      "tablet": {
+        "width": 768,
+        "height": 1024
+      },
+      "mobile": {
+        "width": 375,
+        "height": 667
+      }
+    }
+  },
+  "notifications": {
+    "on_startup": true,
+    "on_error": true
+  }
+}

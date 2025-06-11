@@ -1,49 +1,83 @@
-# Screenshot Manager
+# Screenshot Manager for WSL
 
-WSL上から Windows のスクリーンショットを自動的に監視・整理するツールです。
+Claude Codeで作成したWebアプリケーションの起動後画面を自動的にキャプチャし、動作確認を支援するツールです。Windows上でスクリーンショットを撮影し、WSL環境のプロジェクトフォルダに自動的に保存・整理します。
 
-## 機能
+## 🎯 主要機能
 
-- WSLからWindowsのスクリーンショットフォルダを直接監視
-- 新しいスクリーンショットを自動的にWSL内にコピー
-- 日付ごとにフォルダ分けして整理
-- 重複ファイルの自動検出とスキップ
-- 古いファイルの自動クリーンアップ
-- 転送ログの記録
-- 統合管理スクリプトによる簡単な操作
+### 📁 現在の機能（v1.0）
+- **自動監視**: Windowsのスクリーンショットフォルダを監視し、新しい画像を自動的に検出
+- **自動整理**: 日付別フォルダに自動的に整理
+- **重複検出**: MD5ハッシュによる重複ファイルの自動検出と削除
+- **自動クリーンアップ**: 指定日数経過後の古いスクリーンショットを自動削除
+- **転送ログ**: すべての転送操作をJSON形式で記録
+- **高度な撮影機能**: 特定のモニターやウィンドウのスクリーンショット撮影
+
+### 🚀 開発中の機能（v2.0）
+- **Webアプリ自動検知**: Claude Codeで作成したアプリの起動を自動検出
+- **ブラウザ自動化**: 起動したWebアプリを自動的に開いてキャプチャ
+- **レスポンシブテスト**: 複数の画面サイズで自動スクリーンショット
+- **動作確認レポート**: スクリーンショットギャラリーとエラー検出
+
+## 📋 使用シナリオ
+
+### 現在の使い方
+```bash
+# Claude Codeでアプリを作成
+claude> "Reactでタスク管理アプリを作って"
+
+# 手動でスクリーンショット撮影
+./take_screenshot.sh
+
+# 自動的に整理・保存される
+```
+
+### 将来の使い方（v2.0）
+```bash
+# Claude Codeでアプリを作成
+claude> "Reactでタスク管理アプリを作って"
+
+# 自動的に以下が実行される：
+# 1. Webアプリの起動検知（port 3000）
+# 2. ブラウザで自動的に開く
+# 3. 複数解像度でスクリーンショット
+# 4. レポート生成
+```
 
 ## プロジェクト構造
 
 ```
 screenshot-manager/
-├── screenshot_monitor.py   # メイン監視スクリプト
-├── screenshot_manager.sh   # 統合管理スクリプト
-├── setup.sh               # 初回セットアップスクリプト
-├── config/                # 設定ファイル
-│   └── config.json.template
-├── screenshots/           # スクリーンショット保存先（自動生成）
-├── logs/                  # ログファイル（自動生成）
-├── .gitignore            # Git除外設定
+├── screenshot_monitor.py       # メイン監視スクリプト
+├── screenshot_manager.sh       # 統合管理スクリプト
+├── take_screenshot.sh          # 高度なスクリーンショット撮影
+├── setup.sh                   # 初回セットアップスクリプト
+├── requirements.txt           # Python依存関係
+├── config/                    # 設定ファイル
+│   ├── config.json.template   # 設定テンプレート
+│   └── config.json           # 実際の設定（自動生成）
+├── screenshots/              # スクリーンショット保存先（自動生成）
+├── logs/                     # ログファイル（自動生成）
+├── .gitignore               # Git除外設定
+├── CLAUDE.md                # プロジェクト固有ルール
+├── ROADMAP.md               # 開発ロードマップ
+├── WEBAPP_DETECTION.md      # Webアプリ検知機能設計
 └── README.md
 ```
 
-## セットアップ
+## 📦 セットアップ
 
-### 1. リポジトリのクローン
+### 基本セットアップ
 
 ```bash
+# 1. リポジトリのクローン
 git clone https://github.com/your-username/screenshot-manager.git
 cd screenshot-manager
-```
 
-### 2. 初回セットアップの実行
-
-```bash
-# セットアップスクリプトを実行
-./screenshot_manager.sh setup
-
-# または直接セットアップスクリプトを実行
+# 2. 基本機能のセットアップ
 ./setup.sh
+
+# 3. 監視開始
+./screenshot_manager.sh start
 ```
 
 セットアップスクリプトでは以下の設定を行います：
@@ -61,9 +95,9 @@ cd screenshot-manager
 ./screenshot_manager.sh config
 ```
 
-## 使用方法
+## 📖 使用方法
 
-### 基本的なコマンド
+### 基本的な監視コマンド
 
 ```bash
 # 監視を開始（バックグラウンド）
@@ -92,6 +126,30 @@ cd screenshot-manager
 
 # ヘルプを表示
 ./screenshot_manager.sh help
+```
+
+### 高度なスクリーンショット機能
+
+```bash
+# モニター一覧表示
+./take_screenshot.sh --list-monitors
+
+# ウィンドウ一覧表示
+./take_screenshot.sh --list-windows
+
+# 全画面スクリーンショット
+./take_screenshot.sh
+
+# 指定モニターのスクリーンショット
+./take_screenshot.sh --monitor 0
+./take_screenshot.sh --monitor 1 monitor1.png
+
+# プロセス指定スクリーンショット
+./take_screenshot.sh --process Chrome
+./take_screenshot.sh --process Code vscode.png
+
+# ウィンドウハンドル指定
+./take_screenshot.sh --window 67938
 ```
 
 ### 自動起動の設定
@@ -186,67 +244,46 @@ WSLの起動時に自動的に監視を開始する場合：
 5. 重複ファイルはMD5ハッシュで検出してスキップ
 6. 指定日数を経過した古いファイルは自動削除
 
-## MCP（Model Context Protocol）サーバーとしての使用
+## 🔧 必要な環境
 
-### MCPサーバーのインストール
+### 基本要件
+- Windows 10/11 with WSL2
+- Python 3.8以上
+- bash
+- PowerShell（スクリーンショット撮影用）
+
+### 将来の要件（v2.0）
+- Node.js（Webアプリ検知用）
+- Playwright/Selenium（ブラウザ自動化用）
+
+## 📝 依存関係
 
 ```bash
-# MCP環境の自動セットアップ
-./install_mcp.sh
+# 必要なPythonライブラリ
+pip3 install -r requirements.txt
 ```
 
-### 手動設定
+### requirements.txt内容
+- `watchdog>=3.0.0` - ファイル監視用
 
-1. MCPライブラリのインストール：
-   ```bash
-   pip3 install mcp
-   ```
+### 将来の依存関係（v2.0）
+- `playwright` - ブラウザ自動化
+- `requests` - HTTP監視
+- `pyyaml` - 設定ファイル
 
-2. Claude Desktop設定ファイル（`~/.config/claude/claude_desktop_config.json`）に追加：
-   ```json
-   {
-     "mcpServers": {
-       "screenshot-manager": {
-         "command": "python3",
-         "args": ["/path/to/screenshot-manager/mcp_screenshot_server.py"],
-         "env": {}
-       }
-     }
-   }
-   ```
+## 今後の開発計画
 
-3. Claude Desktopを再起動
+詳細は[ROADMAP.md](ROADMAP.md)を参照してください。
 
-### MCPツールの使用
+### Phase 1: Webアプリ自動監視機能（開発中）
+- ポート監視によるWebアプリ起動検知
+- ブラウザ自動化によるスクリーンショット
+- レスポンシブデザインテスト
 
-Claude Desktop内で自然言語でスクリーンショット機能を操作できます：
-
-```
-# 使用例
-「モニター一覧を表示して」
-「Chromeのスクリーンショットを撮影して」
-「モニター1のスクリーンショットを保存して」
-「スクリーンショット監視を開始して」
-```
-
-### 利用可能なMCPツール
-
-- `list_monitors`: 利用可能なモニター一覧表示
-- `list_windows`: 実行中のウィンドウ一覧表示
-- `take_screenshot`: 全画面スクリーンショット撮影
-- `take_monitor_screenshot`: 指定モニターのスクリーンショット撮影
-- `take_process_screenshot`: 指定プロセスのスクリーンショット撮影
-- `take_window_screenshot`: 指定ウィンドウのスクリーンショット撮影
-- `monitor_status`: 監視状態確認
-- `start_monitor`: 監視開始
-- `stop_monitor`: 監視停止
-
-## 必要な環境
-
-- Windows 10/11 with WSL2
-- Python 3.6以上
-- bash
-- MCP対応クライアント（Claude Desktop等）（オプション）
+### Phase 2: 開発ワークフロー統合
+- Claude Codeとの連携強化
+- コード変更時の自動再キャプチャ
+- ビジュアルリグレッションテスト
 
 ## ライセンス
 

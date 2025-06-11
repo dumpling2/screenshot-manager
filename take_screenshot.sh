@@ -24,12 +24,15 @@ for (\$i = 0; \$i -lt \$monitors.Count; \$i++) {
 list_windows() {
     echo "実行中のウィンドウ:"
     powershell.exe -Command "
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 Get-Process | Where-Object { \$_.MainWindowHandle -ne 0 -and \$_.MainWindowTitle -ne '' } | 
 ForEach-Object { 
     \$handle = \$_.MainWindowHandle.ToInt64()
     \$process = \$_.ProcessName
     \$title = \$_.MainWindowTitle
-    Write-Host \"Handle: \$handle, Process: \$process, Title: \$title\"
+    # 日本語文字を安全にエンコード
+    \$safeTitle = \$title -replace '[^\x00-\x7F]', '?'
+    Write-Host \"Handle: \$handle, Process: \$process, Title: \$safeTitle\"
 }
 "
 }
