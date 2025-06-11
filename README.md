@@ -1,22 +1,43 @@
 # Screenshot Manager for WSL
 
-Claude Codeで作成したWebアプリケーションの起動後画面を自動的にキャプチャし、動作確認を支援するツールです。Windows上でスクリーンショットを撮影し、WSL環境のプロジェクトフォルダに自動的に保存・整理します。
+Claude Codeで作成したWebアプリケーションの起動後画面を自動的にキャプチャし、動作確認を支援するツールです。
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-WSL2-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/Python-3.8+-green" alt="Python">
+  <img src="https://img.shields.io/badge/Status-Active Development-orange" alt="Status">
+</p>
 
 ## 🎯 主要機能
 
-### 📁 現在の機能（v1.0）
-- **自動監視**: Windowsのスクリーンショットフォルダを監視し、新しい画像を自動的に検出
-- **自動整理**: 日付別フォルダに自動的に整理
-- **重複検出**: MD5ハッシュによる重複ファイルの自動検出と削除
-- **自動クリーンアップ**: 指定日数経過後の古いスクリーンショットを自動削除
-- **転送ログ**: すべての転送操作をJSON形式で記録
-- **高度な撮影機能**: 特定のモニターやウィンドウのスクリーンショット撮影
+### ✨ 現在利用可能な機能
+- 📁 **自動スクリーンショット管理**: Windows→WSL自動転送・整理
+- 🎯 **高度撮影機能**: モニター・ウィンドウ指定撮影
+- 🔍 **重複検出**: 自動重複ファイル削除
+- 🧹 **自動クリーンアップ**: 古いファイルの自動削除
 
-### 🚀 開発中の機能（v2.0）
-- **Webアプリ自動検知**: Claude Codeで作成したアプリの起動を自動検出
-- **ブラウザ自動化**: 起動したWebアプリを自動的に開いてキャプチャ
-- **レスポンシブテスト**: 複数の画面サイズで自動スクリーンショット
-- **動作確認レポート**: スクリーンショットギャラリーとエラー検出
+### 🚀 新機能（v2.0 - 開発中）
+- 🌐 **Webアプリ自動検知**: Claude Codeアプリの起動を自動検出
+- 🤖 **ブラウザ自動化**: 自動アクセス・マルチデバイステスト
+- 📊 **動作確認レポート**: HTML形式の見やすいレポート
+
+## 🚀 クイックスタート
+
+```bash
+# 1. リポジトリをクローン
+git clone https://github.com/your-username/screenshot-manager.git
+cd screenshot-manager
+
+# 2. セットアップ
+./setup.sh
+
+# 3. 基本監視開始
+./screenshot_manager.sh start
+
+# 4. Webアプリ監視（新機能）
+./install_webapp_deps.sh  # 初回のみ
+./webapp_monitor.py
+```
 
 ## 📋 使用シナリオ
 
@@ -25,266 +46,84 @@ Claude Codeで作成したWebアプリケーションの起動後画面を自動
 # Claude Codeでアプリを作成
 claude> "Reactでタスク管理アプリを作って"
 
-# 手動でスクリーンショット撮影
+# 手動スクリーンショット
 ./take_screenshot.sh
 
-# 自動的に整理・保存される
+# 自動的に整理・保存される ✓
 ```
 
-### 将来の使い方（v2.0）
+### 新機能での使い方（v2.0）
 ```bash
 # Claude Codeでアプリを作成
 claude> "Reactでタスク管理アプリを作って"
 
 # 自動的に以下が実行される：
-# 1. Webアプリの起動検知（port 3000）
-# 2. ブラウザで自動的に開く
-# 3. 複数解像度でスクリーンショット
-# 4. レポート生成
+# 1. Webアプリの起動検知 🔍
+# 2. ブラウザで自動オープン 🌐
+# 3. 複数解像度でキャプチャ 📱💻
+# 4. レポート生成 📊
 ```
 
-## プロジェクト構造
+## 📖 ドキュメント
 
-```
-screenshot-manager/
-├── screenshot_monitor.py       # メイン監視スクリプト
-├── screenshot_manager.sh       # 統合管理スクリプト
-├── take_screenshot.sh          # 高度なスクリーンショット撮影
-├── setup.sh                   # 初回セットアップスクリプト
-├── requirements.txt           # Python依存関係
-├── config/                    # 設定ファイル
-│   ├── config.json.template   # 設定テンプレート
-│   └── config.json           # 実際の設定（自動生成）
-├── screenshots/              # スクリーンショット保存先（自動生成）
-├── logs/                     # ログファイル（自動生成）
-├── .gitignore               # Git除外設定
-├── CLAUDE.md                # プロジェクト固有ルール
-├── ROADMAP.md               # 開発ロードマップ
-├── WEBAPP_DETECTION.md      # Webアプリ検知機能設計
-└── README.md
-```
-
-## 📦 セットアップ
-
-### 基本セットアップ
-
-```bash
-# 1. リポジトリのクローン
-git clone https://github.com/your-username/screenshot-manager.git
-cd screenshot-manager
-
-# 2. 基本機能のセットアップ
-./setup.sh
-
-# 3. 監視開始
-./screenshot_manager.sh start
-```
-
-セットアップスクリプトでは以下の設定を行います：
-- Windowsのユーザー名の入力
-- スクリーンショットフォルダの確認
-- 設定ファイルの自動生成
-- 必要なディレクトリの作成
-- 実行権限の設定
-
-### 3. 設定内容の確認（オプション）
-
-生成された設定ファイルを確認・編集する場合：
-
-```bash
-./screenshot_manager.sh config
-```
-
-## 📖 使用方法
-
-### 基本的な監視コマンド
-
-```bash
-# 監視を開始（バックグラウンド）
-./screenshot_manager.sh start
-
-# 監視を停止
-./screenshot_manager.sh stop
-
-# 監視を再起動
-./screenshot_manager.sh restart
-
-# 状態を確認
-./screenshot_manager.sh status
-
-# ログを表示
-./screenshot_manager.sh logs
-
-# リアルタイムでログを監視
-./screenshot_manager.sh logs --tail
-
-# デバッグモード（フォアグラウンドで実行）
-./screenshot_manager.sh watch
-
-# 設定ファイルを編集
-./screenshot_manager.sh config
-
-# ヘルプを表示
-./screenshot_manager.sh help
-```
-
-### 高度なスクリーンショット機能
-
-```bash
-# モニター一覧表示
-./take_screenshot.sh --list-monitors
-
-# ウィンドウ一覧表示
-./take_screenshot.sh --list-windows
-
-# 全画面スクリーンショット
-./take_screenshot.sh
-
-# 指定モニターのスクリーンショット
-./take_screenshot.sh --monitor 0
-./take_screenshot.sh --monitor 1 monitor1.png
-
-# プロセス指定スクリーンショット
-./take_screenshot.sh --process Chrome
-./take_screenshot.sh --process Code vscode.png
-
-# ウィンドウハンドル指定
-./take_screenshot.sh --window 67938
-```
-
-### 自動起動の設定
-
-WSLの起動時に自動的に監視を開始する場合：
-
-1. `~/.bashrc`または`~/.zshrc`に以下を追加：
-   ```bash
-   # Screenshot Manager auto start
-   if [ ! -f "/home/mikanu/便利アプリ/screenshot manager/logs/monitor.pid" ]; then
-       /home/mikanu/便利アプリ/screenshot\ manager/screenshot_manager.sh start
-   fi
-   ```
-
-2. または、cronを使用：
-   ```bash
-   crontab -e
-   ```
-   
-   以下を追加：
-   ```
-   @reboot /home/mikanu/便利アプリ/screenshot\ manager/screenshot_manager.sh start
-   ```
-
-## 設定オプション
-
-### config.json の詳細
-
-- `windowsUsername`: Windowsのユーザー名
-- `windowsScreenshotPath`: Windowsのスクリーンショット保存先（{username}は自動置換）
-- `localScreenshotPath`: WSL内の保存先（相対パス）
-- `checkInterval`: 監視間隔（秒）
-- `filePattern`: 監視するファイルパターン（配列）
-- `organizeByDate`: 日付別フォルダ分けの有効/無効
-- `dateFormat`: 日付フォルダの形式（Python strftime形式）
-- `maxFileSizeMB`: 最大ファイルサイズ（MB）
-- `autoCleanup`: 自動クリーンアップ設定
-  - `enabled`: 有効/無効
-  - `daysToKeep`: 保持する日数
-
-## トラブルシューティング
-
-### スクリーンショットが検出されない
-
-1. Windowsのスクリーンショットフォルダパスを確認：
-   ```bash
-   ls /mnt/c/Users/あなたのユーザー名/Pictures/Screenshots/
-   ```
-
-2. 設定ファイルのパスが正しいか確認：
-   ```bash
-   ./screenshot_manager.sh config
-   ```
-
-3. ログを確認：
-   ```bash
-   ./screenshot_manager.sh logs --tail
-   ```
-
-### 監視が開始できない
-
-1. 既に実行中でないか確認：
-   ```bash
-   ./screenshot_manager.sh status
-   ```
-
-2. ログファイルの権限を確認：
-   ```bash
-   ls -la logs/
-   ```
-
-3. Python3がインストールされているか確認：
-   ```bash
-   python3 --version
-   ```
-
-### ファイルがコピーされない
-
-1. Windowsフォルダへのアクセス権限を確認
-2. ディスク容量を確認
-3. 転送ログを確認：
-   ```bash
-   tail -f logs/transfers.jsonl
-   ```
-
-## 動作の仕組み
-
-1. WSLから`/mnt/c`経由でWindowsのファイルシステムにアクセス
-2. 指定されたスクリーンショットフォルダを定期的に監視
-3. 新しいファイルを検出したら、WSL内のプロジェクトフォルダにコピー
-4. ファイルは日付ごとのフォルダに自動整理
-5. 重複ファイルはMD5ハッシュで検出してスキップ
-6. 指定日数を経過した古いファイルは自動削除
+| カテゴリ | ドキュメント | 内容 |
+|---------|-------------|------|
+| **👤 ユーザー向け** | [📖 セットアップガイド](docs/user/SETUP.md) | 詳細インストール手順 |
+| | [🎮 使用方法](docs/user/USAGE.md) | 機能別の使い方 |
+| | [🔧 トラブルシューティング](docs/user/TROUBLESHOOTING.md) | よくある問題と解決法 |
+| **👨‍💻 開発者向け** | [🗺️ ロードマップ](docs/dev/ROADMAP.md) | 開発計画・今後の機能 |
+| | [🏗️ アーキテクチャ](docs/dev/ARCHITECTURE.md) | システム構成・技術仕様 |
+| **📐 設計書** | [🌐 Webアプリ検知](docs/design/webapp-detection.md) | 自動検知システム設計 |
+| | [🤖 AI連携](docs/design/ai-integration.md) | 将来のAI機能設計 |
 
 ## 🔧 必要な環境
 
-### 基本要件
-- Windows 10/11 with WSL2
-- Python 3.8以上
-- bash
-- PowerShell（スクリーンショット撮影用）
+- **OS**: Windows 10/11 + WSL2
+- **Python**: 3.8以上
+- **その他**: PowerShell, bash
 
-### 将来の要件（v2.0）
-- Node.js（Webアプリ検知用）
-- Playwright/Selenium（ブラウザ自動化用）
+### 新機能用（v2.0）
+- **Node.js**: Webアプリ検知用
+- **Playwright**: ブラウザ自動化用
 
-## 📝 依存関係
+## ⚡ 主要コマンド
 
 ```bash
-# 必要なPythonライブラリ
-pip3 install -r requirements.txt
+# 基本監視
+./screenshot_manager.sh start|stop|status
+
+# 高度撮影
+./take_screenshot.sh --monitor 0
+./take_screenshot.sh --process Chrome
+
+# Webアプリ監視（新機能）
+./webapp_monitor.py
+
+# テスト
+./test_webapp_monitor.py
 ```
 
-### requirements.txt内容
-- `watchdog>=3.0.0` - ファイル監視用
+## 🤝 貢献・サポート
 
-### 将来の依存関係（v2.0）
-- `playwright` - ブラウザ自動化
-- `requests` - HTTP監視
-- `pyyaml` - 設定ファイル
+- 🐛 **バグ報告**: [Issues](https://github.com/your-username/screenshot-manager/issues)
+- 💡 **機能要望**: [Discussions](https://github.com/your-username/screenshot-manager/discussions)
+- 📖 **開発に参加**: [開発ガイド](docs/dev/CONTRIBUTING.md)
 
-## 今後の開発計画
+## 📊 開発状況
 
-詳細は[ROADMAP.md](ROADMAP.md)を参照してください。
+| Phase | 機能 | 状況 |
+|-------|------|------|
+| ✅ v1.0 | 基本スクリーンショット管理 | **完成** |
+| 🚧 v2.0 | Webアプリ自動検知 | **開発中** |
+| 📅 v3.0 | Claude Code連携強化 | 計画中 |
+| 📅 v4.0 | CI/CD統合 | 計画中 |
 
-### Phase 1: Webアプリ自動監視機能（開発中）
-- ポート監視によるWebアプリ起動検知
-- ブラウザ自動化によるスクリーンショット
-- レスポンシブデザインテスト
+## 📄 ライセンス
 
-### Phase 2: 開発ワークフロー統合
-- Claude Codeとの連携強化
-- コード変更時の自動再キャプチャ
-- ビジュアルリグレッションテスト
+MIT License - 詳細は [LICENSE](LICENSE) をご覧ください。
 
-## ライセンス
+---
 
-MIT License
+<p align="center">
+  <strong>🎉 Claude Codeでの開発を、より効率的に！</strong>
+</p>
