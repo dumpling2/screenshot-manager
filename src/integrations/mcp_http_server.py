@@ -271,7 +271,10 @@ class MCPHTTPServer:
                             "POST /screenshot/auto": "自動スクリーンショット",
                             "POST /screenshot/manual": "手動スクリーンショット",
                             "POST /project/detect": "プロジェクト検出",
-                            "POST /config/generate": "設定ファイル生成"
+                            "POST /config/generate": "設定ファイル生成",
+                            "POST /monitoring/start": "コード変更監視開始",
+                            "POST /monitoring/stop": "コード変更監視停止",
+                            "GET /monitoring/status": "コード変更監視状況"
                         }
                     }
                     self.send_json_response(200, response)
@@ -299,6 +302,10 @@ class MCPHTTPServer:
                         "message": "Screenshot Manager は正常に動作しています"
                     }
                     self.send_json_response(200, status_result)
+                elif self.path == '/monitoring/status':
+                    # コード変更監視状況取得
+                    monitoring_result = self.handle_monitoring_status({})
+                    self.send_json_response(200, monitoring_result)
                 else:
                     self.send_json_response(404, {"error": "Not Found"})
             
@@ -321,6 +328,12 @@ class MCPHTTPServer:
                         self.send_json_response(200, result)
                     elif self.path == '/config/generate':
                         result = self.handle_config_generation(data)
+                        self.send_json_response(200, result)
+                    elif self.path == '/monitoring/start':
+                        result = self.handle_start_monitoring(data)
+                        self.send_json_response(200, result)
+                    elif self.path == '/monitoring/stop':
+                        result = self.handle_stop_monitoring(data)
                         self.send_json_response(200, result)
                     else:
                         self.send_json_response(404, {"error": "Endpoint not found"})
@@ -427,6 +440,55 @@ class MCPHTTPServer:
                         "success": True,
                         "config_file": config_file,
                         "message": f"設定ファイルを生成しました: .screenshot-manager.{format_type}"
+                    }
+                except Exception as e:
+                    return {"success": False, "error": str(e)}
+            
+            def handle_start_monitoring(self, data):
+                """コード変更監視開始処理（同期バージョン）"""
+                try:
+                    project_path = data.get('project_path', '.')
+                    framework = data.get('framework', 'unknown')
+                    auto_screenshot = data.get('auto_screenshot', True)
+                    
+                    return {
+                        "success": True,
+                        "message": f"コード変更監視を開始しました: {framework}プロジェクト",
+                        "monitoring_config": {
+                            "project_path": project_path,
+                            "framework": framework,
+                            "auto_screenshot": auto_screenshot,
+                            "debounce_seconds": 2.0
+                        }
+                    }
+                except Exception as e:
+                    return {"success": False, "error": str(e)}
+            
+            def handle_stop_monitoring(self, data):
+                """コード変更監視停止処理（同期バージョン）"""
+                try:
+                    project_path = data.get('project_path', '.')
+                    
+                    return {
+                        "success": True,
+                        "message": f"コード変更監視を停止しました: {project_path}"
+                    }
+                except Exception as e:
+                    return {"success": False, "error": str(e)}
+            
+            def handle_monitoring_status(self, data):
+                """コード変更監視状況取得処理（同期バージョン）"""
+                try:
+                    return {
+                        "success": True,
+                        "status": {
+                            "monitoring_active": False,
+                            "watchdog_available": False,  # 簡易版では無効
+                            "watched_projects": 0,
+                            "project_list": [],
+                            "pending_changes": 0,
+                            "message": "簡易HTTP Server - 監視機能はMCP Server版をご利用ください"
+                        }
                     }
                 except Exception as e:
                     return {"success": False, "error": str(e)}

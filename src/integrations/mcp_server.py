@@ -71,6 +71,7 @@ class ScreenshotManagerMCP:
     def __init__(self):
         self.server = MCPServer("screenshot-manager")
         self.logger = logging.getLogger(__name__)
+        self.code_monitor = None  # Phase 2.3: コード変更監視
         self.setup_tools()
     
     def setup_tools(self):
@@ -109,6 +110,25 @@ class ScreenshotManagerMCP:
             "get_status",
             "Screenshot Managerの現在の状態を取得",
             self.handle_status_check
+        )
+        
+        # コード変更監視機能（Phase 2.3）
+        self.server.add_tool(
+            "start_code_monitoring",
+            "プロジェクトのコード変更監視を開始し、変更時に自動スクリーンショット",
+            self.handle_start_code_monitoring
+        )
+        
+        self.server.add_tool(
+            "stop_code_monitoring",
+            "プロジェクトのコード変更監視を停止",
+            self.handle_stop_code_monitoring
+        )
+        
+        self.server.add_tool(
+            "get_monitoring_status",
+            "コード変更監視の状況を取得",
+            self.handle_get_monitoring_status
         )
     
     async def handle_auto_screenshot(self, args: Dict[str, Any]) -> Dict[str, Any]:
@@ -387,6 +407,130 @@ class ScreenshotManagerMCP:
                 error=str(e),
                 execution_time=execution_time
             )
+    
+    # Phase 2.3: コード変更監視機能
+    async def handle_start_code_monitoring(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """コード変更監視開始処理"""
+        try:
+            project_path = args.get('project_path', '.')
+            framework = args.get('framework', None)
+            auto_screenshot = args.get('auto_screenshot', True)
+            debounce_seconds = args.get('debounce_seconds', 2.0)
+            
+            self.logger.info(f"コード変更監視開始要求: {project_path}")
+            
+            # コード変更監視を初期化（必要に応じて）
+            if self.code_monitor is None:
+                from ..monitors.code_change_monitor import CodeChangeMonitor
+                self.code_monitor = CodeChangeMonitor(logger=self.logger)
+                await self.code_monitor.start_monitoring()
+            
+            # プロジェクト監視設定を作成
+            from ..monitors.code_change_monitor import create_project_watch_config
+            config = await create_project_watch_config(project_path, framework)
+            config.auto_screenshot = auto_screenshot
+            config.debounce_seconds = debounce_seconds
+            
+            # 監視を追加
+            success = await self.code_monitor.add_project_watch(config)
+            
+            if success:
+                return {
+                    "success": True,
+                    "message": f"コード変更監視を開始しました: {framework or 'unknown'}プロジェクト",
+                    "monitoring_config": {
+                        "project_path": project_path,
+                        "framework": config.framework,
+                        "auto_screenshot": config.auto_screenshot,
+                        "debounce_seconds": config.debounce_seconds
+                    }
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": "コード変更監視の開始に失敗しました"
+                }
+                
+        except Exception as e:
+            self.logger.error(f"コード変更監視開始エラー: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "message": "コード変更監視開始処理中にエラーが発生しました"
+            }
+    
+    async def handle_stop_code_monitoring(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """コード変更監視停止処理"""
+        try:
+            project_path = args.get('project_path', '.')
+            
+            self.logger.info(f"コード変更監視停止要求: {project_path}")
+            
+            if self.code_monitor is None:
+                return {
+                    "success": False,
+                    "error": "コード変更監視が開始されていません"
+                }
+            
+            # プロジェクトキーを作成
+            project_key = str(Path(project_path).resolve())
+            
+            # 監視を停止
+            success = await self.code_monitor.remove_project_watch(project_key)
+            
+            if success:
+                return {
+                    "success": True,
+                    "message": f"コード変更監視を停止しました: {project_path}"
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": "コード変更監視の停止に失敗しました"
+                }
+                
+        except Exception as e:
+            self.logger.error(f"コード変更監視停止エラー: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "message": "コード変更監視停止処理中にエラーが発生しました"
+            }
+    
+    async def handle_get_monitoring_status(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """コード変更監視状況取得処理"""
+        try:
+            if self.code_monitor is None:
+                return {
+                    "success": True,
+                    "status": {
+                        "monitoring_active": False,
+                        "watched_projects": 0,
+                        "message": "コード変更監視は開始されていません"
+                    }
+                }
+            
+            status = self.code_monitor.get_status()
+            
+            return {
+                "success": True,
+                "status": {
+                    "monitoring_active": status['running'],
+                    "watchdog_available": status['watchdog_available'],
+                    "watched_projects": status['watched_projects'],
+                    "project_list": status['project_list'],
+                    "pending_changes": status['pending_changes_count'],
+                    "message": f"{status['watched_projects']}個のプロジェクトを監視中"
+                }
+            }
+            
+        except Exception as e:
+            self.logger.error(f"コード変更監視状況取得エラー: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "message": "コード変更監視状況取得処理中にエラーが発生しました"
+            }
     
     async def start_server(self, host: str = 'localhost', port: int = 8080):
         """MCPサーバーを開始"""
