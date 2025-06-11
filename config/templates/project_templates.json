@@ -1,0 +1,450 @@
+{
+  "React": {
+    "project": {
+      "framework": "React",
+      "dev_command": "npm run dev",
+      "build_command": "npm run build",
+      "port": 3000
+    },
+    "monitoring": {
+      "watch_files": [
+        "src/**/*.{js,jsx,ts,tsx}",
+        "public/**/*",
+        "package.json"
+      ],
+      "ignore_patterns": [
+        "node_modules/**",
+        ".git/**",
+        "build/**",
+        "dist/**"
+      ],
+      "capture_triggers": [
+        "startup",
+        "code_change",
+        "error_detected",
+        "manual_request"
+      ],
+      "debounce_ms": 2000
+    },
+    "testing": {
+      "browsers": ["chrome"],
+      "viewports": {
+        "desktop": [1920, 1080],
+        "tablet": [768, 1024],
+        "mobile": [375, 667]
+      },
+      "pages_to_test": [
+        {
+          "path": "/",
+          "name": "Home",
+          "wait_for": ".App"
+        },
+        {
+          "path": "/about",
+          "name": "About",
+          "optional": true
+        }
+      ]
+    },
+    "capture": {
+      "wait_before_capture": 3000,
+      "full_page": true,
+      "error_selectors": [
+        ".error-overlay",
+        ".error-boundary",
+        "[data-testid='error']",
+        ".ant-message-error",
+        ".alert-danger"
+      ]
+    }
+  },
+  
+  "Vue": {
+    "project": {
+      "framework": "Vue",
+      "dev_command": "npm run dev",
+      "build_command": "npm run build",
+      "port": 3000
+    },
+    "monitoring": {
+      "watch_files": [
+        "src/**/*.{vue,js,ts}",
+        "public/**/*",
+        "package.json"
+      ],
+      "ignore_patterns": [
+        "node_modules/**",
+        ".git/**",
+        "dist/**"
+      ],
+      "capture_triggers": [
+        "startup",
+        "code_change",
+        "error_detected"
+      ],
+      "debounce_ms": 2000
+    },
+    "testing": {
+      "browsers": ["chrome"],
+      "viewports": {
+        "desktop": [1920, 1080],
+        "tablet": [768, 1024],
+        "mobile": [375, 667]
+      },
+      "pages_to_test": [
+        {
+          "path": "/",
+          "name": "Home",
+          "wait_for": "#app"
+        }
+      ]
+    },
+    "capture": {
+      "wait_before_capture": 3000,
+      "full_page": true,
+      "error_selectors": [
+        ".error",
+        "[data-testid='error']",
+        ".v-alert--type-error"
+      ]
+    }
+  },
+  
+  "Angular": {
+    "project": {
+      "framework": "Angular",
+      "dev_command": "ng serve",
+      "build_command": "ng build",
+      "port": 4200
+    },
+    "monitoring": {
+      "watch_files": [
+        "src/**/*.{ts,html,scss,css}",
+        "angular.json",
+        "package.json"
+      ],
+      "ignore_patterns": [
+        "node_modules/**",
+        ".git/**",
+        "dist/**"
+      ],
+      "capture_triggers": [
+        "startup",
+        "code_change",
+        "error_detected"
+      ],
+      "debounce_ms": 3000
+    },
+    "testing": {
+      "browsers": ["chrome"],
+      "viewports": {
+        "desktop": [1920, 1080],
+        "tablet": [768, 1024],
+        "mobile": [375, 667]
+      },
+      "pages_to_test": [
+        {
+          "path": "/",
+          "name": "Home",
+          "wait_for": "app-root"
+        }
+      ]
+    },
+    "capture": {
+      "wait_before_capture": 4000,
+      "full_page": true,
+      "error_selectors": [
+        ".error",
+        "[data-testid='error']",
+        ".alert-danger"
+      ]
+    }
+  },
+  
+  "Next.js": {
+    "project": {
+      "framework": "Next.js",
+      "dev_command": "npm run dev",
+      "build_command": "npm run build",
+      "port": 3000
+    },
+    "monitoring": {
+      "watch_files": [
+        "pages/**/*.{js,jsx,ts,tsx}",
+        "components/**/*.{js,jsx,ts,tsx}",
+        "app/**/*.{js,jsx,ts,tsx}",
+        "src/**/*.{js,jsx,ts,tsx}",
+        "public/**/*",
+        "package.json",
+        "next.config.js"
+      ],
+      "ignore_patterns": [
+        "node_modules/**",
+        ".git/**",
+        ".next/**",
+        "out/**"
+      ],
+      "capture_triggers": [
+        "startup",
+        "code_change",
+        "error_detected"
+      ],
+      "debounce_ms": 2000
+    },
+    "testing": {
+      "browsers": ["chrome"],
+      "viewports": {
+        "desktop": [1920, 1080],
+        "tablet": [768, 1024],
+        "mobile": [375, 667]
+      },
+      "pages_to_test": [
+        {
+          "path": "/",
+          "name": "Home",
+          "wait_for": "#__next"
+        },
+        {
+          "path": "/api/hello",
+          "name": "API Test",
+          "optional": true,
+          "type": "api"
+        }
+      ]
+    },
+    "capture": {
+      "wait_before_capture": 3000,
+      "full_page": true,
+      "error_selectors": [
+        ".nextjs__container_errors",
+        ".error",
+        "[data-testid='error']"
+      ]
+    }
+  },
+  
+  "Django": {
+    "project": {
+      "framework": "Django",
+      "dev_command": "python manage.py runserver",
+      "build_command": "python manage.py collectstatic",
+      "port": 8000
+    },
+    "monitoring": {
+      "watch_files": [
+        "**/*.py",
+        "templates/**/*.html",
+        "static/**/*",
+        "requirements.txt",
+        "manage.py"
+      ],
+      "ignore_patterns": [
+        "__pycache__/**",
+        "*.pyc",
+        ".git/**",
+        "venv/**",
+        "env/**",
+        "staticfiles/**"
+      ],
+      "capture_triggers": [
+        "startup",
+        "code_change",
+        "error_detected"
+      ],
+      "debounce_ms": 3000
+    },
+    "testing": {
+      "browsers": ["chrome"],
+      "viewports": {
+        "desktop": [1920, 1080],
+        "tablet": [768, 1024],
+        "mobile": [375, 667]
+      },
+      "pages_to_test": [
+        {
+          "path": "/",
+          "name": "Home",
+          "wait_for": "body"
+        },
+        {
+          "path": "/admin/",
+          "name": "Admin",
+          "optional": true
+        }
+      ]
+    },
+    "capture": {
+      "wait_before_capture": 2000,
+      "full_page": true,
+      "error_selectors": [
+        ".errorlist",
+        ".error",
+        ".alert-danger",
+        "#traceback"
+      ]
+    }
+  },
+  
+  "Flask": {
+    "project": {
+      "framework": "Flask",
+      "dev_command": "python app.py",
+      "build_command": "",
+      "port": 5000
+    },
+    "monitoring": {
+      "watch_files": [
+        "**/*.py",
+        "templates/**/*.html",
+        "static/**/*",
+        "requirements.txt"
+      ],
+      "ignore_patterns": [
+        "__pycache__/**",
+        "*.pyc",
+        ".git/**",
+        "venv/**",
+        "env/**"
+      ],
+      "capture_triggers": [
+        "startup",
+        "code_change",
+        "error_detected"
+      ],
+      "debounce_ms": 2000
+    },
+    "testing": {
+      "browsers": ["chrome"],
+      "viewports": {
+        "desktop": [1920, 1080],
+        "tablet": [768, 1024],
+        "mobile": [375, 667]
+      },
+      "pages_to_test": [
+        {
+          "path": "/",
+          "name": "Home",
+          "wait_for": "body"
+        }
+      ]
+    },
+    "capture": {
+      "wait_before_capture": 2000,
+      "full_page": true,
+      "error_selectors": [
+        ".error",
+        ".alert-danger",
+        ".flash-error"
+      ]
+    }
+  },
+  
+  "Express": {
+    "project": {
+      "framework": "Express",
+      "dev_command": "npm run dev",
+      "build_command": "npm run build",
+      "port": 3000
+    },
+    "monitoring": {
+      "watch_files": [
+        "**/*.js",
+        "routes/**/*",
+        "views/**/*",
+        "public/**/*",
+        "package.json"
+      ],
+      "ignore_patterns": [
+        "node_modules/**",
+        ".git/**"
+      ],
+      "capture_triggers": [
+        "startup",
+        "code_change",
+        "error_detected"
+      ],
+      "debounce_ms": 2000
+    },
+    "testing": {
+      "browsers": ["chrome"],
+      "viewports": {
+        "desktop": [1920, 1080],
+        "tablet": [768, 1024],
+        "mobile": [375, 667]
+      },
+      "pages_to_test": [
+        {
+          "path": "/",
+          "name": "Home",
+          "wait_for": "body"
+        },
+        {
+          "path": "/api",
+          "name": "API",
+          "optional": true,
+          "type": "api"
+        }
+      ]
+    },
+    "capture": {
+      "wait_before_capture": 2000,
+      "full_page": true,
+      "error_selectors": [
+        ".error",
+        ".alert-danger"
+      ]
+    }
+  },
+  
+  "Vite": {
+    "project": {
+      "framework": "Vite",
+      "dev_command": "npm run dev",
+      "build_command": "npm run build",
+      "port": 5173
+    },
+    "monitoring": {
+      "watch_files": [
+        "src/**/*.{js,ts,jsx,tsx,vue}",
+        "index.html",
+        "package.json",
+        "vite.config.*"
+      ],
+      "ignore_patterns": [
+        "node_modules/**",
+        ".git/**",
+        "dist/**"
+      ],
+      "capture_triggers": [
+        "startup",
+        "code_change",
+        "error_detected"
+      ],
+      "debounce_ms": 1500
+    },
+    "testing": {
+      "browsers": ["chrome"],
+      "viewports": {
+        "desktop": [1920, 1080],
+        "tablet": [768, 1024],
+        "mobile": [375, 667]
+      },
+      "pages_to_test": [
+        {
+          "path": "/",
+          "name": "Home",
+          "wait_for": "#app, #root"
+        }
+      ]
+    },
+    "capture": {
+      "wait_before_capture": 2000,
+      "full_page": true,
+      "error_selectors": [
+        ".error-overlay",
+        ".error",
+        "[data-testid='error']"
+      ]
+    }
+  }
+}

@@ -61,6 +61,9 @@ class PlaywrightScreenshotCapture:
             # レスポンシブテスト
             await self._capture_responsive_screenshots(app_info, output_dir)
             
+            # 主要ページ巡回キャプチャ
+            await self._capture_page_tour(app_info, output_dir)
+            
             # エラーページのチェック
             await self._check_for_errors(app_info, output_dir)
             
@@ -134,13 +137,11 @@ class PlaywrightScreenshotCapture:
         
         for device_name, viewport in viewports.items():
             try:
-                page = await self.context.new_page()
-                
-                # ビューポート設定
-                await page.set_viewport_size(
-                    width=viewport['width'],
-                    height=viewport['height']
+                # 新しいコンテキストでビューポートを設定
+                context = await self.browser.new_context(
+                    viewport={'width': viewport['width'], 'height': viewport['height']}
                 )
+                page = await context.new_page()
                 
                 # ページ読み込み
                 await page.goto(app_info.url, wait_until='networkidle')
@@ -153,9 +154,77 @@ class PlaywrightScreenshotCapture:
                 )
                 
                 await page.close()
+                await context.close()
                 
             except Exception as e:
                 self.logger.error(f"{device_name}スクリーンショットエラー: {e}")
+                if 'context' in locals():
+                    await context.close()
+    
+    async def _capture_page_tour(self, app_info, output_dir: Path):
+        """主要ページ巡回キャプチャ"""
+        pages = self.config.get('capture', {}).get('pages', ['/'])
+        
+        if not pages or pages == ['/']: 
+            self.logger.info("主要ページ巡回: ルートページのみ（既に撮影済み）")
+            return
+        
+        self.logger.info(f"主要ページ巡回開始: {len(pages)}ページ")
+        page_tour_dir = output_dir / "page_tour"
+        page_tour_dir.mkdir(exist_ok=True)
+        
+        page = await self.context.new_page()
+        
+        try:
+            for i, page_path in enumerate(pages):
+                try:
+                    # URLを構築
+                    if page_path.startswith('http'):
+                        page_url = page_path  # 絶対URL
+                    else:
+                        page_url = f"{app_info.url.rstrip('/')}{page_path}"
+                    
+                    self.logger.info(f"ページ巡回 {i+1}/{len(pages)}: {page_url}")
+                    
+                    # ページアクセス
+                    await page.goto(page_url, wait_until='networkidle', timeout=15000)
+                    await page.wait_for_timeout(2000)  # ページ安定化待機
+                    
+                    # ページ名を生成（URL安全な文字列に変換）
+                    page_name = page_path.replace('/', '_').replace('?', '_').replace('#', '_')
+                    if page_name.startswith('_'):
+                        page_name = page_name[1:]
+                    if not page_name:
+                        page_name = 'root'
+                    
+                    # スクリーンショット撮影
+                    await page.screenshot(
+                        path=page_tour_dir / f"{i+1:02d}_{page_name}.png",
+                        full_page=True
+                    )
+                    
+                    # ページ情報を保存
+                    page_info = {
+                        'url': page_url,
+                        'path': page_path,
+                        'title': await page.title(),
+                        'timestamp': datetime.now().isoformat(),
+                        'order': i + 1
+                    }
+                    
+                    with open(page_tour_dir / f"{i+1:02d}_{page_name}_info.json", 'w') as f:
+                        json.dump(page_info, f, indent=2, ensure_ascii=False)
+                    
+                    self.logger.info(f"✅ {page_path} キャプチャ完了")
+                    
+                except Exception as e:
+                    self.logger.error(f"ページキャプチャエラー ({page_path}): {e}")
+                    continue
+        
+        finally:
+            await page.close()
+        
+        self.logger.info(f"主要ページ巡回完了: {page_tour_dir}")
     
     async def _check_for_errors(self, app_info, output_dir: Path):
         """エラーページの検出"""

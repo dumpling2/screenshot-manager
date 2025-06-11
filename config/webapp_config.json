@@ -5,7 +5,7 @@
   "startup_timeout": 30,
   "capture": {
     "wait_before_capture": 2000,
-    "pages": ["/"],
+    "pages": ["/", "/about.html"],
     "error_selectors": [
       ".error",
       ".alert-danger",

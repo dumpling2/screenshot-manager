@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Claude Code Test App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .nav-link {
+            color: white;
+            text-decoration: underline;
+            margin: 10px;
+            display: inline-block;
+        }
+        .version-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📖 About This Application</h1>
+        
+        <div class="version-badge">v2.0 - Testing Phase</div>
+        
+        <p>このアプリケーションはScreenshot Manager for WSLのテスト用に作成されました。</p>
+        
+        <h2>🔧 主な機能:</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>🔍 自動検知</h3>
+                <p>Webアプリの起動を自動検知</p>
+            </div>
+            <div class="feature-card">
+                <h3>📸 スクリーンショット</h3>
+                <p>複数解像度でのキャプチャ</p>
+            </div>
+            <div class="feature-card">
+                <h3>🔄 ページ巡回</h3>
+                <p>設定されたページの自動巡回</p>
+            </div>
+            <div class="feature-card">
+                <h3>📊 レポート生成</h3>
+                <p>HTMLレポートの自動生成</p>
+            </div>
+        </div>
+        
+        <h2>🚀 技術スタック:</h2>
+        <ul>
+            <li><strong>フロントエンド:</strong> Vanilla HTML/CSS/JavaScript</li>
+            <li><strong>監視:</strong> Python + Port Monitoring</li>
+            <li><strong>キャプチャ:</strong> Playwright + Chromium</li>
+            <li><strong>レポート:</strong> HTML生成</li>
+        </ul>
+        
+        <h2>🎯 テスト項目:</h2>
+        <ul>
+            <li>✅ ポート監視・アプリ検知</li>
+            <li>✅ レスポンシブスクリーンショット</li>
+            <li>🔄 主要ページ巡回キャプチャ</li>
+            <li>🔄 エラー画面検出</li>
+        </ul>
+        
+        <div style="margin-top: 30px;">
+            <a href="/" class="nav-link">🏠 ホームに戻る</a>
+            <a href="/contact.html" class="nav-link">📧 お問い合わせ</a>
+            <a href="/docs.html" class="nav-link">📚 ドキュメント</a>
+        </div>
+        
+        <div style="margin-top: 20px; opacity: 0.8;">
+            <p><small>📸 このページは主要ページ巡回機能のテスト対象です</small></p>
+            <p><small>作成日時: <span id="timestamp"></span></small></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('timestamp').textContent = new Date().toLocaleString('ja-JP');
+        console.log('About page loaded - testing page tour functionality');
+    </script>
+</body>
+</html>
