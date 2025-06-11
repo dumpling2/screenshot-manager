@@ -3,11 +3,15 @@
 Webアプリ監視機能のテストスクリプト
 """
 
+import sys
 import time
 import threading
 import subprocess
 from pathlib import Path
 import json
+
+# 親ディレクトリをPythonパスに追加
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 def start_test_server(port=3000):
     """テスト用のHTTPサーバーを起動"""
@@ -45,7 +49,7 @@ def test_port_detection():
     
     try:
         # webapp_monitorをインポート
-        from webapp_monitor import PortMonitor
+        from src.monitors.webapp_monitor import PortMonitor
         
         # ポートモニターを作成
         monitor = PortMonitor(ports=[3000])
@@ -88,7 +92,7 @@ def test_config_loading():
     print("\n⚙️ 設定ファイル読み込みをテストします...")
     
     try:
-        from webapp_monitor import WebAppMonitor
+        from src.monitors.webapp_monitor import WebAppMonitor
         
         # 設定ファイルが存在しない場合でもデフォルト設定で動作することを確認
         monitor = WebAppMonitor()

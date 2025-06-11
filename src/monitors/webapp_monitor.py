@@ -307,7 +307,7 @@ class WebAppMonitor:
         filename = f"webapp_{app_info.framework}_{app_info.port}_{timestamp}.png"
         
         # take_screenshot.shを使用
-        script_path = Path(__file__).parent / 'take_screenshot.sh'
+        script_path = Path(__file__).parent / 'scripts' / 'take_screenshot.sh'
         if script_path.exists():
             cmd = f'"{script_path}" "{filename}"'
             result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
@@ -320,7 +320,7 @@ class WebAppMonitor:
     def capture_with_playwright(self, app_info: AppInfo):
         """Playwrightを使用した高度なスクリーンショット撮影"""
         try:
-            from playwright_capture import capture_webapp_sync
+            from src.capture.playwright_capture import capture_webapp_sync
             
             result = capture_webapp_sync(
                 app_info=app_info,

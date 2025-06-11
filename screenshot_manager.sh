@@ -4,7 +4,7 @@
 # WSL上からスクリーンショットの監視と管理を行います
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MONITOR_SCRIPT="$SCRIPT_DIR/screenshot_monitor.py"
+MONITOR_SCRIPT="$SCRIPT_DIR/src/monitors/webapp_monitor.py"
 PID_FILE="$SCRIPT_DIR/logs/monitor.pid"
 LOG_FILE="$SCRIPT_DIR/logs/manager.log"
 
@@ -262,7 +262,7 @@ case "$1" in
     screenshot)
         # スクリーンショット撮影
         shift
-        "$SCRIPT_DIR/take_screenshot.sh" "$@"
+        "$SCRIPT_DIR/scripts/take_screenshot.sh" "$@"
         ;;
     help|--help|-h)
         show_help

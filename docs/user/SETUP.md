@@ -74,7 +74,7 @@ cat config/config.json
 
 ```bash
 # Webアプリ監視機能の依存関係を自動インストール
-./install_webapp_deps.sh
+./scripts/install_webapp_deps.sh
 ```
 
 #### インストールされる内容
@@ -130,7 +130,7 @@ nano config/webapp_config.json
 
 ```bash
 # 1. 統合テスト実行
-./test_webapp_monitor.py
+python3 tests/test_webapp_monitor.py
 
 # 期待される出力：
 # ✅ webapp_monitor.py の基本的なインポートテスト成功
@@ -139,7 +139,7 @@ nano config/webapp_config.json
 # 🎉 すべてのテストが成功しました!
 
 # 2. 実際の監視開始
-./webapp_monitor.py
+python3 src/monitors/webapp_monitor.py
 ```
 
 ## 📁 プロジェクト構造の確認
@@ -155,7 +155,11 @@ screenshot-manager/
 ├── 📁 logs/               # ログファイル
 ├── 📁 docs/               # ドキュメント
 ├── 🔧 screenshot_manager.sh # 管理スクリプト
-├── 🔧 webapp_monitor.py    # Webアプリ監視
+├── 📁 src/                  # ソースコード
+│   ├── monitors/          # 監視モジュール
+│   └── capture/           # キャプチャモジュール
+├── 📁 scripts/             # スクリプト集
+├── 📁 tests/               # テストファイル
 └── 📄 README.md           # 概要
 ```
 

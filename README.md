@@ -35,8 +35,8 @@ cd screenshot-manager
 ./screenshot_manager.sh start
 
 # 4. Webアプリ監視（新機能）
-./install_webapp_deps.sh  # 初回のみ
-./webapp_monitor.py
+./scripts/install_webapp_deps.sh  # 初回のみ
+python3 src/monitors/webapp_monitor.py
 ```
 
 ## 📋 使用シナリオ
@@ -74,7 +74,6 @@ claude> "Reactでタスク管理アプリを作って"
 | **👨‍💻 開発者向け** | [🗺️ ロードマップ](docs/dev/ROADMAP.md) | 開発計画・今後の機能 |
 | | [🏗️ アーキテクチャ](docs/dev/ARCHITECTURE.md) | システム構成・技術仕様 |
 | **📐 設計書** | [🌐 Webアプリ検知](docs/design/webapp-detection.md) | 自動検知システム設計 |
-| | [🤖 AI連携](docs/design/ai-integration.md) | 将来のAI機能設計 |
 
 ## 🔧 必要な環境
 
@@ -97,10 +96,10 @@ claude> "Reactでタスク管理アプリを作って"
 ./take_screenshot.sh --process Chrome
 
 # Webアプリ監視（新機能）
-./webapp_monitor.py
+python3 src/monitors/webapp_monitor.py
 
 # テスト
-./test_webapp_monitor.py
+python3 tests/test_webapp_monitor.py
 ```
 
 ## 🤝 貢献・サポート
