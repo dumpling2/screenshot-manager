@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue.js Todo App Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+        }
+        .completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+        .stats {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .demo-note {
+            background: #4CAF50;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Vue.js Todo App</h1>
+        <p style="text-align: center;">Claude Codeで作成されたタスク管理アプリケーション</p>
+        
+        <div class="todo-item">
+            <input type="checkbox" checked> 
+            <span class="completed">Vue.jsプロジェクトの作成</span>
+        </div>
+        <div class="todo-item">
+            <input type="checkbox" checked> 
+            <span class="completed">Todoアプリの実装</span>
+        </div>
+        <div class="todo-item">
+            <input type="checkbox"> 
+            <span>Screenshot Managerでのテスト</span>
+        </div>
+        <div class="todo-item">
+            <input type="checkbox"> 
+            <span>レポート確認</span>
+        </div>
+        
+        <div class="stats">
+            完了: 2 / 全体: 4
+        </div>
+        
+        <div class="demo-note">
+            🎯 Screenshot Manager デモ実行中<br>
+            自動的に複数解像度でキャプチャされます
+        </div>
+    </div>
+    
+    <script>
+        console.log('Vue.js Todo App Demo - Framework: Vue');
+        console.log('Screenshot Manager によるテスト実行中');
+    </script>
+</body>
+</html>
