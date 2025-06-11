@@ -1,0 +1,159 @@
+{
+  "test_summary": {
+    "timestamp": "2025-06-11T22:19:56.142638",
+    "total_tests": 6,
+    "passed_tests": 4,
+    "success_rate": 66.66666666666666
+  },
+  "test_results": [
+    {
+      "name": "Error Handling",
+      "success": false
+    },
+    {
+      "name": "Performance Monitoring",
+      "success": true
+    },
+    {
+      "name": "Reliability Management",
+      "success": true
+    },
+    {
+      "name": "Advanced Logging",
+      "success": false
+    },
+    {
+      "name": "Integrated Scenarios",
+      "success": true
+    },
+    {
+      "name": "System Recovery",
+      "success": true
+    }
+  ],
+  "system_statistics": {
+    "error_stats": {
+      "total_errors": 0,
+      "resolved_errors": 0,
+      "recent_errors": 0,
+      "error_metrics": {},
+      "error_categories": {
+        "network": 0,
+        "filesystem": 0,
+        "playwright": 0,
+        "mcp": 0,
+        "config": 0,
+        "process": 0,
+        "watchdog": 0,
+        "screenshot": 0,
+        "unknown": 0
+      },
+      "severity_distribution": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "info": 0
+      }
+    },
+    "performance_summary": {
+      "status": "inactive",
+      "resource_usage": {
+        "avg_cpu_percent": 0.725,
+        "avg_memory_percent": 25.5,
+        "current_cpu": 0.7,
+        "current_memory": 25.5
+      },
+      "execution_times": {
+        "test_heavy_operation": {
+          "avg_time": 0.7588820457458496,
+          "max_time": 1.0111651420593262,
+          "min_time": 0.506598949432373,
+          "call_count": 2
+        }
+      },
+      "cache_stats": {
+        "size": 0,
+        "max_size": 1000,
+        "hit_rate": 0.0,
+        "expired_items": 0
+      },
+      "task_queue_stats": {
+        "queue_size": 0,
+        "active_tasks": 0,
+        "completed_tasks": 0,
+        "failed_tasks": 0,
+        "max_concurrent": 5
+      },
+      "metrics_count": 2,
+      "thresholds": {
+        "max_cpu": 80.0,
+        "max_memory": 85.0,
+        "max_execution_time": 30.0
+      }
+    },
+    "log_stats": {
+      "log_level": "INFO",
+      "log_directory": "/home/mikanu/便利アプリ/screenshot manager/logs",
+      "metrics_summary": {
+        "operation_tracker_duration": {
+          "count": 2,
+          "sum": 818.263053894043,
+          "min": 306.6568374633789,
+          "max": 511.60621643066406,
+          "avg": 409.1315269470215,
+          "last_value": 511.60621643066406,
+          "last_updated": "2025-06-11T22:19:53.103129"
+        }
+      },
+      "recent_alerts": [],
+      "log_files": [
+        {
+          "name": "performance.log",
+          "size_mb": 0.0,
+          "modified": "2025-06-11T22:19:33.272100"
+        },
+        {
+          "name": "manager.log",
+          "size_mb": 0.0004062652587890625,
+          "modified": "2025-06-11T04:19:07.784668"
+        },
+        {
+          "name": "reliability.log",
+          "size_mb": 0.0,
+          "modified": "2025-06-11T22:19:52.589706"
+        },
+        {
+          "name": "readable.log",
+          "size_mb": 0.0036220550537109375,
+          "modified": "2025-06-11T22:19:56.129915"
+        },
+        {
+          "name": "webapp_monitor.log",
+          "size_mb": 0.0,
+          "modified": "2025-06-11T20:22:29.082814"
+        },
+        {
+          "name": "monitor.log",
+          "size_mb": 0.0019245147705078125,
+          "modified": "2025-06-11T04:19:06.767601"
+        },
+        {
+          "name": "structured.log",
+          "size_mb": 0.013052940368652344,
+          "modified": "2025-06-11T22:19:56.129915"
+        },
+        {
+          "name": "recovery.log",
+          "size_mb": 0.0,
+          "modified": "2025-06-11T22:19:52.589706"
+        },
+        {
+          "name": "error_handler.log",
+          "size_mb": 0.0025386810302734375,
+          "modified": "2025-06-11T22:19:51.576756"
+        }
+      ]
+    }
+  }
+}
