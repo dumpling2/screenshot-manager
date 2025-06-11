@@ -1,0 +1,149 @@
+version: '3.8'
+
+services:
+  # メインアプリケーション
+  screenshot-manager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: screenshot-manager-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/app/logs
+      - ./screenshots:/app/screenshots
+      - ./config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - ENV=development
+      - LOG_LEVEL=INFO
+      - DISPLAY=:99
+    restart: unless-stopped
+    networks:
+      - screenshot-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Webアプリ監視サービス
+  webapp-monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: screenshot-webapp-monitor
+    command: ["screenshot-monitor"]
+    volumes:
+      - ./logs:/app/logs
+      - ./screenshots:/app/screenshots
+      - ./config:/app/config
+    environment:
+      - ENV=development
+      - LOG_LEVEL=INFO
+      - DISPLAY=:99
+    restart: unless-stopped
+    networks:
+      - screenshot-network
+    depends_on:
+      screenshot-manager:
+        condition: service_healthy
+
+  # MCPサーバー (Claude Code統合用)
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: screenshot-mcp-server
+    command: ["mcp-server"]
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./logs:/app/logs
+      - ./screenshots:/app/screenshots
+      - ./config:/app/config
+    environment:
+      - ENV=development
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    networks:
+      - screenshot-network
+    depends_on:
+      screenshot-manager:
+        condition: service_healthy
+
+  # 開発用データベース (今後の機能拡張用)
+  redis:
+    image: redis:7-alpine
+    container_name: screenshot-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - screenshot-network
+    command: redis-server --appendonly yes
+
+  # ログ収集・監視用
+  log-collector:
+    image: fluent/fluent-bit:latest
+    container_name: screenshot-log-collector
+    volumes:
+      - ./logs:/fluent-bit/logs:ro
+      - ./monitoring/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+    restart: unless-stopped
+    networks:
+      - screenshot-network
+    depends_on:
+      - screenshot-manager
+
+  # メトリクス監視 (Prometheus + Grafana)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: screenshot-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    restart: unless-stopped
+    networks:
+      - screenshot-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: screenshot-grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: unless-stopped
+    networks:
+      - screenshot-network
+    depends_on:
+      - prometheus
+
+networks:
+  screenshot-network:
+    driver: bridge
+    name: screenshot-network
+
+volumes:
+  redis_data:
+    name: screenshot-redis-data
+  prometheus_data:
+    name: screenshot-prometheus-data
+  grafana_data:
+    name: screenshot-grafana-data

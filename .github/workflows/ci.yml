@@ -1,0 +1,252 @@
+name: Screenshot Manager CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  # 静的解析・リンティング
+  lint:
+    runs-on: ubuntu-latest
+    name: 🔍 コード品質チェック
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Python環境セットアップ
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Python依存関係インストール
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort mypy
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    - name: コードフォーマット確認 (Black)
+      run: black --check --diff src/ test*.py
+    
+    - name: インポートソート確認 (isort)  
+      run: isort --check-only --diff src/ test*.py
+    
+    - name: 構文チェック (flake8)
+      run: flake8 src/ test*.py --max-line-length=88 --ignore=E203,W503
+    
+    - name: 型チェック (mypy)
+      run: mypy src/ --ignore-missing-imports || true
+
+  # 単体テスト・統合テスト
+  test:
+    runs-on: ubuntu-latest
+    name: 🧪 テスト実行
+    needs: lint
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Python ${{ matrix.python-version }} セットアップ
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: システム依存関係インストール
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y xvfb
+    
+    - name: Python依存関係インストール
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-asyncio pytest-cov
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    - name: Playwright依存関係インストール
+      run: |
+        pip install playwright
+        playwright install chromium --with-deps
+    
+    - name: 単体テスト実行
+      run: |
+        export DISPLAY=:99
+        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        python -m pytest tests/ -v --cov=src/ --cov-report=xml
+    
+    - name: 統合テスト実行
+      run: |
+        export DISPLAY=:99
+        python test_phase24_integration.py
+    
+    - name: カバレッジアップロード
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  # セキュリティスキャン
+  security:
+    runs-on: ubuntu-latest
+    name: 🔒 セキュリティスキャン
+    needs: lint
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Python環境セットアップ
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: セキュリティツールインストール
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit safety
+    
+    - name: 脆弱性スキャン (bandit)
+      run: bandit -r src/ -f json -o bandit-report.json || true
+    
+    - name: 依存関係セキュリティチェック (safety)
+      run: safety check --json --output safety-report.json || true
+    
+    - name: セキュリティレポートアップロード
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+
+  # パフォーマンステスト
+  performance:
+    runs-on: ubuntu-latest
+    name: ⚡ パフォーマンステスト
+    needs: test
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Python環境セットアップ
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: 依存関係インストール
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install memory-profiler psutil
+    
+    - name: パフォーマンステスト実行
+      run: |
+        python -c "
+        import asyncio
+        from src.utils.performance_monitor import PerformanceMonitor
+        
+        async def perf_test():
+            monitor = PerformanceMonitor()
+            await monitor.start_monitoring(interval=1.0)
+            await asyncio.sleep(5)
+            stats = monitor.get_performance_summary()
+            print(f'CPU使用率: {stats[\"resource_usage\"][\"avg_cpu_percent\"]}%')
+            print(f'メモリ使用率: {stats[\"resource_usage\"][\"avg_memory_percent\"]}%')
+            await monitor.stop_monitoring()
+            
+        asyncio.run(perf_test())
+        "
+
+  # リリース準備
+  release:
+    runs-on: ubuntu-latest
+    name: 📦 リリース準備
+    needs: [test, security, performance]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: リリースノート生成
+      id: release_notes
+      run: |
+        # 前回のタグから今回までのコミットを取得
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "初回リリース")
+        echo "last_tag=$LAST_TAG" >> $GITHUB_OUTPUT
+        
+        # リリースノート生成
+        echo "# Screenshot Manager Release" > release_notes.md
+        echo "" >> release_notes.md
+        echo "## 変更内容" >> release_notes.md
+        if [ "$LAST_TAG" != "初回リリース" ]; then
+          git log --pretty=format:"- %s" ${LAST_TAG}..HEAD >> release_notes.md
+        else
+          git log --pretty=format:"- %s" >> release_notes.md
+        fi
+    
+    - name: バージョン自動生成
+      id: version
+      run: |
+        # セマンティックバージョニング
+        VERSION=$(date +"%Y.%m.%d")-$(git rev-parse --short HEAD)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Generated version: $VERSION"
+    
+    - name: GitHubリリース作成
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.version.outputs.version }}
+        release_name: Screenshot Manager v${{ steps.version.outputs.version }}
+        body_path: release_notes.md
+        draft: false
+        prerelease: false
+
+  # デプロイメント (本番環境向け)
+  deploy:
+    runs-on: ubuntu-latest
+    name: 🚀 デプロイメント
+    needs: release
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: 本番環境設定ファイル生成
+      run: |
+        mkdir -p deploy/
+        cat > deploy/docker-compose.prod.yml << 'EOF'
+        version: '3.8'
+        services:
+          screenshot-manager:
+            build: 
+              context: .
+              dockerfile: Dockerfile
+            environment:
+              - ENV=production
+              - LOG_LEVEL=INFO
+            volumes:
+              - ./logs:/app/logs
+              - ./screenshots:/app/screenshots
+              - ./config:/app/config
+            ports:
+              - "8080:8080"
+            restart: unless-stopped
+            healthcheck:
+              test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health')"]
+              interval: 30s
+              timeout: 10s
+              retries: 3
+        EOF
+    
+    - name: デプロイメント成功通知
+      run: |
+        echo "🎉 Screenshot Manager が正常にデプロイされました!"
+        echo "バージョン: ${{ needs.release.outputs.version }}"
+        echo "デプロイ時刻: $(date)"
